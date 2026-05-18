@@ -109,9 +109,16 @@ export class FastChecker {
     // Idle-session heartbeat watchdog: fires every 50 min regardless of REPL state
     const HEARTBEAT_INTERVAL_MS = 50 * 60 * 1000;
     const agentName = this.agent.name;
+    // Invoke the CLI via the current Node binary + bundled dist/cli.js rather
+    // than a bare `cortextos`. On Windows the npm shim only exists as
+    // cortextos.cmd/.ps1, so execFile (no shell, no PATHEXT) throws
+    // `spawn cortextos ENOENT` every cycle — silently killing this watchdog.
+    // process.execPath + dist/cli.js is shell/PATH-independent and matches the
+    // canonical invocation in src/cli/setup.ts.
+    const cliJs = join(this.frameworkRoot, 'dist', 'cli.js');
     this.heartbeatTimer = setInterval(() => {
       const ts = new Date().toISOString();
-      execFile('cortextos', ['bus', 'update-heartbeat', `[watchdog] ${agentName} alive — idle session ${ts}`], (err) => {
+      execFile(process.execPath, [cliJs, 'bus', 'update-heartbeat', `[watchdog] ${agentName} alive — idle session ${ts}`], (err) => {
         if (err) this.log(`Heartbeat watchdog error: ${err.message}`);
       });
     }, HEARTBEAT_INTERVAL_MS);
