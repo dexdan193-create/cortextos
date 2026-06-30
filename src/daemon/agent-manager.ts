@@ -465,7 +465,7 @@ export class AgentManager {
             `poll failures since ${info.since} (${info.lastErrorClass}: ${info.lastError})`,
           );
           try {
-            logEvent(paths, name, resolvedOrg, 'error', 'comms_degraded', 'error', {
+            logEvent(paths, name, resolvedOrg, 'action', 'comms_degraded', 'warning', {
               agent: name,
               consecutive_failures: info.consecutiveFailures,
               since: info.since,
