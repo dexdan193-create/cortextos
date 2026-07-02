@@ -286,11 +286,9 @@ export class TelegramPoller {
         try {
           await this.pollOnce();
         } catch (err) {
-          // Intentional stop() wins over any error classification: stop() sets
-          // lastExitReason='stopped-externally' and running=false before this
-          // catch fires. Return immediately so the Conflict check below cannot
-          // overwrite it.
-          if (!this.running) return;
+          // Intentional stop() wins over any error classification. Explicit set
+          // is belt-and-braces: do not rely solely on stop() having run first.
+          if (!this.running) { this.lastExitReason = 'stopped-externally'; return; }
           const msg = err instanceof Error ? err.message : String(err);
           // A 409 Conflict means another getUpdates connection holds the lock
           // (e.g. a not-yet-released connection lingering ~60s after a daemon
