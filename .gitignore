@@ -67,3 +67,7 @@ WINDOWS_INSTALL_REPORT.md
 *INSTALL_REPORT.md
 /PHASE*-REPORT.md
 docs/phase-reports/
+
+# Claude Code session memory — internal agent/project memory, never public.
+# Added 2026-07-17: missed by 2026-07-01 remediation pass (path appeared later).
+projects/
