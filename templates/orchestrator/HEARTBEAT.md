@@ -46,10 +46,10 @@ Human tasks reference: `.claude/skills/human-tasks/SKILL.md`
 cortextos bus read-all-heartbeats
 
 # Check all pending approvals
-cortextos bus list-approvals --format json 2>/dev/null
+cortextos bus list-approvals --format json
 
 # Check stale human tasks
-cortextos bus list-tasks --project human-tasks --status pending 2>/dev/null
+cortextos bus check-human-tasks
 ```
 
 For each agent: if heartbeat is older than 5 hours, send an alert to that agent and flag in memory.
