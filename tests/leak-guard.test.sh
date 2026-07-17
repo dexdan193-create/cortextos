@@ -56,12 +56,12 @@ bash "$GUARD" "$TMP/farapart.md" >/dev/null 2>&1 \
   || { echo "FAIL: windowed check flagged name+cron far apart (false positive)"; fails=1; }
 
 # (e) Agent-memory PATH shape — the exact file that evaded the guard on 2026-07-17.
-#     projects/C--Users-Dan-cortextos/memory/feedback_specialist_artifact_meta_leak_scrub.md
+#     projects/C--Users-operator-cortextos/memory/feedback_specialist_artifact_meta_leak_scrub.md
 #     ARTIFACT_PATH_RE must flag any projects/<id>/memory/ path. This fixture
 #     PASSED the pre-patch guard (verified: old guard exit 0 = false all-clear reproduced;
 #     new guard exit 1 = flagged). Red-then-green confirmed by direct measurement.
-mkdir -p "$TMP/projects/C--Users-Dan-cortextos/memory"
-AGENT_MEM_FILE="$TMP/projects/C--Users-Dan-cortextos/memory/feedback_specialist_artifact_meta_leak_scrub.md"
+mkdir -p "$TMP/projects/C--Users-operator-cortextos/memory"
+AGENT_MEM_FILE="$TMP/projects/C--Users-operator-cortextos/memory/feedback_specialist_artifact_meta_leak_scrub.md"
 printf '# internal analyst memory\n' > "$AGENT_MEM_FILE"
 bash "$GUARD" "$AGENT_MEM_FILE" >/dev/null 2>&1 \
   && { echo "FAIL: scanner PASSED agent-memory path (projects/*/memory/ — should have failed)"; fails=1; }
