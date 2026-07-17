@@ -29,8 +29,10 @@ report() { printf '::error file=%s::LEAK-GUARD: %s\n' "$1" "$2" >&2; printf '  %
 # 1. Operator home paths — the real operator's machine paths never belong in
 #    the public framework. Match the KNOWN operator identities specifically so
 #    generic example paths (/Users/foo, /home/victim, /Users/.../) do not FP.
-#    Extend OPERATOR_USERS as needed; this is the exact leaked-path class.
-OPERATOR_USERS='cortextos'
+#    LEAK_GUARD_OPERATOR_USERS overrides the default via env (pipe-separated
+#    for orgs with multiple operator names, e.g. "alice|bob"). Extend the
+#    default list as the known operator set grows.
+OPERATOR_USERS="${LEAK_GUARD_OPERATOR_USERS:-cortextos}"
 HOME_PATH_RE="(/Users/(${OPERATOR_USERS})/|/home/(${OPERATOR_USERS})/)"
 
 # 2. Fleet-roster + cron-schedule TABLE shape — the phase-report leak. A line
@@ -44,8 +46,11 @@ ROSTER_CRON_RE='(boris|paul|sentinel|donna|nick)[^\n]*(heartbeat\([0-9]|morning-
 SECRET_RE='(sk-ant-[A-Za-z0-9_-]{20}|sbp_[a-f0-9]{40}|[0-9]{8,}:AA[A-Za-z0-9_-]{30}|AIza[A-Za-z0-9_-]{35}|apify_api_[A-Za-z0-9]{30})'
 SECRET_PLACEHOLDER='x{6,}|1234567890|123456789|EXAMPLE|example|YOUR_|<[a-z]|placeholder|xxxx'
 
-# 4. Operational-artifact PATH shapes — dev reports that should never be public.
-ARTIFACT_PATH_RE='(^|/)(docs/phase-reports/|[A-Za-z0-9_-]*INSTALL_REPORT\.md$|PHASE[0-9]+-[A-Z-]+-REPORT\.md$)'
+# 4. Operational-artifact PATH shapes — dev reports and agent-memory files that
+#    should never be public. projects/<id>/memory/ covers the Claude Code session
+#    memory directory that cortextOS agents write to (path class that evaded the
+#    original 2026-07-01 remediation because the directory appeared later).
+ARTIFACT_PATH_RE='(^|/)(docs/phase-reports/|[A-Za-z0-9_-]*INSTALL_REPORT\.md$|PHASE[0-9]+-[A-Z-]+-REPORT\.md$|projects/[^/]+/memory/)'
 
 scan_file() {
   local f="$1"
