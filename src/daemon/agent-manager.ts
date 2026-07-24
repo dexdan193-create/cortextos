@@ -456,7 +456,8 @@ export class AgentManager {
       // sink — logEvent writes the events JSONL + refreshes heartbeat.json
       // (filesystem-local, NOT a Telegram HTTP call), complementing the
       // durable .comms-degraded marker the poller itself writes. Both
-      // survive the very outage they signal (analyst eve-review §4).
+      // survive the very outage they signal (a Telegram HTTP failure cannot
+      // block filesystem writes).
       const poller = new TelegramPoller(telegramApi, stateDir, 1000, undefined, {
         recreateApi: botToken ? () => new TelegramAPI(botToken) : undefined,
         onCommsDegraded: (info) => {

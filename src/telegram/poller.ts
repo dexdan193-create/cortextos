@@ -38,8 +38,8 @@ export interface CommsRecoveredInfo {
 }
 
 /**
- * Guard #2 (in-process comms-liveness) injection points — analyst eve-review
- * 2026-05-18 §4. All optional: a poller constructed without these keeps the
+ * Guard #2 (in-process comms-liveness) injection points. All optional: a poller
+ * constructed without these keeps the
  * legacy behaviour EXCEPT exponential backoff, which is always-on because it
  * is pure self-protection and the PRIMARY mitigation for the AM-class
  * rate-limit self-sabotage. The degraded marker, recovery callbacks and
@@ -78,7 +78,7 @@ export interface TelegramPollerOptions {
  * Telegram polling loop. Replaces the Telegram portion of fast-checker.sh.
  * Polls getUpdates and routes messages/callbacks to handlers.
  *
- * Guard #2 — in-process comms-liveness detector (analyst eve-review §4).
+ * Guard #2 — in-process comms-liveness detector.
  * Architecturally DISTINCT from the fast-checker 50-minute heartbeat
  * watchdog: that watches *agent*-liveness via a file write and has no
  * poller-restart path at any interval; this watches *comms*-liveness with a
@@ -147,7 +147,7 @@ export class TelegramPoller {
 
   // Backoff doubles per consecutive failure, capped. Cumulative sleep reaches
   // ≈123s by the 7th failure (1+2+4+8+16+32+60) — head-room under the
-  // analyst-measured ~11.5min self-recovery margin and the basis for the
+  // Measured ~11.5min self-recovery margin and the basis for the
   // ≤2min restart SLA.
   private static readonly BACKOFF_MAX_MS = 60_000;
 
@@ -166,7 +166,7 @@ export class TelegramPoller {
   private static readonly WATCHDOG_STALL_MS = 120_000;       // stall threshold
 
   // Stable contract for an external relay (Guard #2 last-mile — out of scope
-  // here; analyst §4 assigns it to an external watchdog).
+  // here; a hung in-process poller cannot reliably signal its own outage).
   private static readonly DEGRADED_MARKER = '.comms-degraded';
   private static readonly DEGRADED_MARKER_SCHEMA = 1;
 
@@ -397,7 +397,7 @@ export class TelegramPoller {
     }
   }
 
-  // ── Guard #2 — comms-liveness (analyst eve-review §4) ───────────────────────
+  // ── Guard #2 — comms-liveness ────────────────────────────────────────────────
 
   /**
    * (i) Exponential backoff. Success (or no failures yet) → normal interval.
@@ -512,8 +512,8 @@ export class TelegramPoller {
    * reload the persisted offset, WITHOUT killing the daemon process. A
    * literal stop()+start() recursion is deliberately avoided — start() is
    * the currently-executing loop, so recursing would stack loops and grow
-   * the call stack unboundedly. This realises the analyst-§4 intent (clean
-   * restart of a wedged-but-alive retry loop) safely and in-process.
+   * the call stack unboundedly. This achieves a clean restart of a
+   * wedged-but-alive retry loop safely and in-process.
    */
   private restartPollerInProcess(): void {
     console.error(
@@ -529,8 +529,8 @@ export class TelegramPoller {
 
   /**
    * Durable comms-degraded marker for an external relay (Guard #2 last-mile,
-   * out of this scope — analyst §4 assigns the relay to an external
-   * watchdog). STABLE PATH: `<stateDir>/.comms-degraded`. STABLE JSON schema
+   * out of this scope — a hung in-process poller cannot reliably signal its
+   * own outage, so the relay is external). STABLE PATH: `<stateDir>/.comms-degraded`. STABLE JSON schema
    * (schema_version 1) — fields a relay can rely on:
    *   schema_version       : number
    *   state                : "degraded"  (file present ⇒ degraded; absent ⇒ ok)
